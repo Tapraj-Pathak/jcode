@@ -42,27 +42,23 @@ impl ProviderAvailability {
 }
 
 pub fn auto_default_provider(availability: ProviderAvailability) -> ActiveProvider {
-    if availability.copilot_premium_zero && availability.copilot {
-        ActiveProvider::Copilot
-    } else if availability.claude {
-        ActiveProvider::Claude
-    } else if availability.openai {
-        ActiveProvider::OpenAI
-    } else if availability.copilot {
-        ActiveProvider::Copilot
-    } else if availability.antigravity {
-        ActiveProvider::Antigravity
-    } else if availability.gemini {
-        ActiveProvider::Gemini
-    } else if availability.cursor {
-        ActiveProvider::Cursor
-    } else if availability.bedrock {
-        ActiveProvider::Bedrock
-    } else if availability.openrouter {
-        ActiveProvider::OpenRouter
-    } else {
-        ActiveProvider::Claude
+    let provider_order = vec![
+    (ActiveProvider::Copilot, availability.copilot),
+    (ActiveProvider::Claude, availability.claude),
+    (ActiveProvider::OpenAI, availability.openai),
+    (ActiveProvider::Antigravity, availability.antigravity),
+    (ActiveProvider::Gemini, availability.gemini),
+    (ActiveProvider::Cursor, availability.cursor),
+    (ActiveProvider::Bedrock, availability.bedrock),
+    (ActiveProvider::OpenRouter, availability.openrouter),
+];
+
+for (provider, is_available) in provider_order {
+    if is_available {
+        return provider;
     }
+}
+return ActiveProvider::Claude; // Fallback to Claude if no providers are available.
 }
 
 pub fn parse_provider_hint(value: &str) -> Option<ActiveProvider> {
